@@ -1,0 +1,18 @@
+# Environment & Secret files
+.env
+.env.*
+*.env
+*.pem
+*.key
+
+# IDE & Local Configs (Claude Desktop, VS Code, Cursor)
+claude_desktop_config.json
+.vscode/
+.idea/
+.cursor/
+
+# Build & Dependency artifacts
+node_modules/
+dist/
+build/
+*.log
