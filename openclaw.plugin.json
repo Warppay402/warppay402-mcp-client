@@ -1,7 +1,7 @@
 {
   "id": "warppay402-mcp-client",
   "name": "@warppay402/mcp-client",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Stdio-to-SSE bridge for WarpPay402 MCP Gateway with automated x402 payment signing.",
   "configSchema": {
     "type": "object",
@@ -11,7 +11,9 @@
         "description": "Base/Solana private key for x402 payment settlements"
       }
     },
-    "required": ["CUSTOMER_PRIVATE_KEY"]
+    "required": [
+      "CUSTOMER_PRIVATE_KEY"
+    ]
   },
   "uiHints": {
     "CUSTOMER_PRIVATE_KEY": {
