@@ -1,6 +1,6 @@
 {
   "name": "@warppay402/mcp-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Stdio-to-SSE bridge for WarpPay402 MCP Gateway with automated x402 payment signing.",
   "main": "dist/mcp-client.js",
   "type": "module",
@@ -12,7 +12,9 @@
     "openclaw.plugin.json"
   ],
   "openclaw": {
-    "extensions": ["./dist/mcp-client.js"],
+    "extensions": [
+      "./dist/mcp-client.js"
+    ],
     "compat": {
       "pluginApi": ">=2026.1.0"
     },
