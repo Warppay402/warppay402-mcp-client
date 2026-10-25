@@ -1,18 +1,95 @@
-# Environment & Secret files
+# ==========================================
+# 1. CRITICAL: Security & Private Keys
+# ==========================================
 .env
 .env.*
-*.env
+!.env.example
 *.pem
 *.key
+*.pkcs12
+*.pfx
+*.p12
+id_rsa
+id_ecdsa
+id_ed25519
+keystore*
+*.keystore
+*secret*
+*credential*
+credentials.json
 
-# IDE & Local Configs (Claude Desktop, VS Code, Cursor)
-claude_desktop_config.json
-.vscode/
-.idea/
-.cursor/
-
-# Build & Dependency artifacts
+# ==========================================
+# 2. Dependency & Package Directories
+# ==========================================
 node_modules/
+jspm_packages/
+web_modules/
+.pnp
+.pnp.js
+
+# ==========================================
+# 3. Build & Compiler Artifacts
+# ==========================================
 dist/
 build/
+out/
+bin/
+*.tsbuildinfo
+.tscache
+
+# ==========================================
+# 4. Logs, Runtime & Debugging
+# ==========================================
+logs/
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ==========================================
+# 5. Local Databases & Persistence
+# ==========================================
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# ==========================================
+# 6. IDE, Workspace & Editor State
+# ==========================================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.cursor/
+.claude/
+
+# ==========================================
+# 7. Operating System Artifacts
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# 8. Testing & Coverage
+# ==========================================
+coverage/
+.nyc_output/
+*.lcov

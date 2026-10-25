@@ -1,6 +1,6 @@
 {
   "name": "@warppay402/mcp-client",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Stdio-to-SSE bridge for WarpPay402 MCP Gateway with automated x402 payment signing.",
   "main": "dist/mcp-client.js",
   "type": "module",
@@ -11,6 +11,17 @@
     "dist",
     "openclaw.plugin.json"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Warppay402/warppay-mcp-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Warppay402/warppay-mcp-client/issues"
+  },
+  "homepage": "https://www.warppay402.com",
   "openclaw": {
     "extensions": [
       "./dist/mcp-client.js"
@@ -23,7 +34,8 @@
     }
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
