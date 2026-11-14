@@ -1,7 +1,7 @@
 {
   "id": "warppay402-mcp-client",
   "name": "@warppay402/mcp-client",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Stdio-to-SSE bridge for WarpPay402 MCP Gateway with automated x402 payment signing and autonomous multi-agent workflows.",
   "configSchema": {
     "type": "object",

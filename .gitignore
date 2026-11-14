@@ -93,3 +93,6 @@ desktop.ini
 coverage/
 .nyc_output/
 *.lcov
+# ClawHub Plugin Inspector & npm pack artifacts
+reports/
+*.tgz

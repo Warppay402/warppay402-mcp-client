@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.Warppay402/warppay402-mcp-client",
+  "title": "WarpPay402 MCP Auto-Signing Bridge",
+  "description": "Stdio-to-SSE MCP bridge with automatic x402 USDC payment signing for Cursor and Claude.",
+  "version": "1.1.1",
+  "websiteUrl": "https://www.warppay402.com",
+  "repository": {
+    "url": "https://github.com/Warppay402/warppay402-mcp-client",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "registryBaseUrl": "https://registry.npmjs.org",
+      "identifier": "@warppay402/mcp-client",
+      "version": "1.1.1",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CUSTOMER_PRIVATE_KEY",
+          "description": "Hex private key (0x...) used to sign x402 USDC micropayments",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
