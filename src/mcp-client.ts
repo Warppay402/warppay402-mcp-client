@@ -18,12 +18,10 @@ if (!rawPrivateKey || !rawPrivateKey.startsWith("0x")) {
   process.exit(1);
 }
 
-// 1. Initialize WarpPay SDK Client for on-chain x402 signing
 const payClient = new WarpPayClient({
   privateKey: rawPrivateKey as `0x${string}`,
 });
 
-// Helper to resolve the correct signing method regardless of SDK minor version
 async function generateSignatureHeader(challenge: any): Promise<string> {
   if (typeof (payClient as any).createPaymentHeader === "function") {
     return await (payClient as any).createPaymentHeader(challenge);
@@ -37,22 +35,17 @@ async function generateSignatureHeader(challenge: any): Promise<string> {
   throw new Error("WarpPayClient has no recognized payment signing method.");
 }
 
-// Active signature queue to safely support concurrent tool calls
 let activePaymentSignature: string | null = null;
 
-// Custom fetch wrapper that injects PAYMENT-SIGNATURE into outbound SSE POST messages
 const x402Fetch: typeof fetch = async (url, init = {}) => {
   const headers = new Headers(init.headers || {});
-
   if (activePaymentSignature) {
     headers.set("PAYMENT-SIGNATURE", activePaymentSignature);
     headers.set("X-PAYMENT-SIGNATURE", activePaymentSignature);
   }
-
   return await fetch(url, { ...init, headers });
 };
 
-// 2. Connect to the WarpPay402 Remote SSE Gateway
 const REMOTE_ENDPOINT = "https://api.warppay402.com/mcp?v=2";
 const sseTransport = new SSEClientTransport(new URL(REMOTE_ENDPOINT), {
   requestInit: {
@@ -64,33 +57,100 @@ const sseTransport = new SSEClientTransport(new URL(REMOTE_ENDPOINT), {
 });
 
 const remoteClient = new Client(
-  { name: "WarpPay402 Local Proxy Client", version: "1.0.3" },
+  { name: "WarpPay402 Local Proxy Client", version: "1.1.0" },
   { capabilities: {} }
 );
 
-// 3. Local Stdio Server exposing tools to Cursor, Windsurf, & Claude Desktop
 const localServer = new Server(
-  { name: "WarpPay402 Bridge", version: "1.0.3" },
+  { name: "WarpPay402 Bridge", version: "1.1.0" },
   { capabilities: { tools: {} } }
 );
+
+const COMPOSITE_AGENT_TOOLS = [
+  {
+    name: "warppay_defi_executor",
+    description:
+      "Autonomous DeFi due-diligence and quote agent orchestrating wallet/contract audits, Aerodrome pool yields, and swap simulation from a single goal ($0.15 USDC).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        goal: {
+          type: "string",
+          description: "Natural-language DeFi due-diligence or swap simulation objective",
+        },
+      },
+      required: ["goal"],
+    },
+  },
+  {
+    name: "warppay_deep_research",
+    description:
+      "Parallel web scraping, UCP merchant catalog search, and forex spot rate synthesis agent from a single goal ($0.05 USDC).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        goal: {
+          type: "string",
+          description: "Natural-language commerce, web research, or currency synthesis objective",
+        },
+      },
+      required: ["goal"],
+    },
+  },
+];
 
 async function main() {
   await remoteClient.connect(sseTransport);
 
-  // Expose remote tool definitions to IDE
   localServer.setRequestHandler(ListToolsRequestSchema, async () => {
-    return await remoteClient.listTools();
+    const remote = await remoteClient.listTools();
+    const existingNames = new Set((remote.tools || []).map((t) => t.name));
+    const mergedTools = [
+      ...(remote.tools || []),
+      ...COMPOSITE_AGENT_TOOLS.filter((t) => !existingNames.has(t.name)),
+    ];
+    return { tools: mergedTools };
   });
 
-  // Intercept and execute tool calls with automated 402 challenge signing
   localServer.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
 
+    // Route composite multi-agent workflows directly through @warppay402/sdk
+    if (name === "warppay_defi_executor" || name === "warppay_deep_research") {
+      try {
+        const goal = String((args as any)?.goal || "").trim();
+        if (!goal) {
+          throw new Error("Missing required parameter: goal");
+        }
+        const result =
+          name === "warppay_defi_executor"
+            ? await (payClient as any).executeDefiAgent(goal)
+            : await (payClient as any).executeDeepResearchAgent(goal);
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: typeof result === "string" ? result : JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      } catch (agentErr: any) {
+        return {
+          content: [
+            {
+              type: "text",
+              text: `[Autonomous Agent Failed]: ${agentErr.message || String(agentErr)}`,
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+
     try {
-      // First attempt: call tool directly
       return await remoteClient.callTool({ name, arguments: args });
     } catch (error: any) {
-      // Detect x402 Payment Required response from remote MCP gateway
       const is402 =
         error?.code === 402 ||
         error?.message?.includes("402") ||
@@ -101,11 +161,8 @@ async function main() {
         try {
           const challenge = error?.data || {};
           const paymentHeader = await generateSignatureHeader(challenge);
-
-          // Arm transport with signed proof
           activePaymentSignature = paymentHeader;
 
-          // Retry tool call with payment proof attached
           const retryResult = await remoteClient.callTool({
             name,
             arguments: args,
@@ -127,7 +184,6 @@ async function main() {
         }
       }
 
-      // Standard tool execution errors
       return {
         content: [
           {

@@ -1,7 +1,7 @@
 {
   "name": "@warppay402/mcp-client",
-  "version": "1.0.3",
-  "description": "Stdio-to-SSE bridge for WarpPay402 MCP Gateway with automated x402 payment signing.",
+  "version": "1.1.0",
+  "description": "Stdio-to-SSE bridge for WarpPay402 MCP Gateway with automated x402 payment signing and autonomous multi-agent workflows.",
   "main": "dist/mcp-client.js",
   "type": "module",
   "bin": {
@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "@warppay402/sdk": "^1.0.0",
+    "@warppay402/sdk": "^1.4.1",
     "dotenv": "^16.4.5"
   },
   "devDependencies": {
